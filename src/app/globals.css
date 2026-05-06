@@ -1,0 +1,70 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --epoch-bg:           #08080f;
+  --epoch-surface:      #12121e;
+  --epoch-card:         #1a1a2e;
+  --epoch-border:       #2a2a4a;
+  --epoch-purple:       #7c3aed;
+  --epoch-purple-light: #a78bfa;
+  --epoch-blue:         #3b82f6;
+  --epoch-text:         #f1f1f5;
+  --epoch-muted:        #9494b0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--epoch-bg);
+  color: var(--epoch-text);
+  font-feature-settings: 'palt' 1;
+}
+
+/* 日本語テキスト向けの行間設定 */
+.prose-epoch {
+  line-height: 2.0;
+  letter-spacing: 0.03em;
+}
+
+/* スクロールバー（縦） */
+::-webkit-scrollbar       { width: 6px; }
+::-webkit-scrollbar-track { background: var(--epoch-bg); }
+::-webkit-scrollbar-thumb { background: var(--epoch-border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--epoch-dim, #5a5a7a); }
+
+/* 横スクロール行のスクロールバー非表示 */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* カードホバーエフェクト */
+.story-card {
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+.story-card:hover {
+  transform: translateY(-4px) scale(1.01);
+  box-shadow: 0 20px 40px rgba(124, 58, 237, 0.2);
+}
+
+/* ペイウォール blur */
+.paywall-blur {
+  position: relative;
+}
+.paywall-blur::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 120px;
+  background: linear-gradient(to bottom, transparent, var(--epoch-bg));
+  pointer-events: none;
+}
