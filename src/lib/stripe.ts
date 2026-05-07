@@ -27,6 +27,8 @@ export async function checkSubscription(email: string): Promise<boolean> {
 
 // Stripe Checkout セッションを作成する
 export async function createCheckoutSession(email: string, returnUrl: string): Promise<string> {
+  // returnUrl からオリジンを取得（success_url のベースに使用）
+  const origin = new URL(returnUrl).origin
   const session = await stripe.checkout.sessions.create({
     mode: 'subscription',
     customer_email: email,
@@ -36,7 +38,8 @@ export async function createCheckoutSession(email: string, returnUrl: string): P
         quantity: 1,
       },
     ],
-    success_url: `${returnUrl}?subscribed=true`,
+    // 決済完了後: /subscribe/success → JWT発行 → 元のページへリダイレクト
+    success_url: `${origin}/subscribe/success?session_id={CHECKOUT_SESSION_ID}&return_to=${encodeURIComponent(returnUrl)}`,
     cancel_url:  returnUrl,
     locale: 'ja',
   })

@@ -115,7 +115,7 @@ export default async function StoryPage({ params }: Props) {
           <div className="mb-8">
             <div className="flex items-center gap-3 mb-4 text-xs text-epoch-muted">
               <span className="px-2 py-0.5 bg-epoch-purple/20 text-epoch-purple-light rounded-full border border-epoch-purple/30">
-                SF
+                {story.genre.toUpperCase()}
               </span>
               <span>{story.theme}</span>
               <time dateTime={story.published_at}>{publishedDate}</time>
