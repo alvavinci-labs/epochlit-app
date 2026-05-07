@@ -6,6 +6,7 @@ export async function GET() {
     .from('stories')
     .select('hash_id, title, genre, preview, image_url, published_at')
     .order('published_at', { ascending: false })
+    .order('created_at', { ascending: false })
     .limit(20)
 
   const items = (stories ?? []).map((s) => `
