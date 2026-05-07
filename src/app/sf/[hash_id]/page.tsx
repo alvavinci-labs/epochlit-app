@@ -119,9 +119,6 @@ export default async function StoryPage({ params }: Props) {
               </span>
               <span>{story.theme}</span>
               <time dateTime={story.published_at}>{publishedDate}</time>
-              {story.quality_score > 0 && (
-                <span className="text-epoch-dim">品質スコア {story.quality_score}/100</span>
-              )}
             </div>
             <h1 className="font-serif text-2xl sm:text-3xl lg:text-4xl font-bold text-epoch-text leading-tight">
               {story.title}
