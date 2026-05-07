@@ -43,7 +43,7 @@ export default function Paywall({ storyUrl }: Props) {
   }
 
   return (
-    <div className="my-12 rounded-2xl border border-epoch-border bg-epoch-surface p-8 text-center">
+    <div className="my-12 rounded-2xl border border-epoch-border bg-epoch-surface p-5 sm:p-8 text-center">
       {/* アイコン */}
       <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-epoch-purple/20 flex items-center justify-center">
         <svg className="w-6 h-6 text-epoch-purple-light" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -62,19 +62,19 @@ export default function Paywall({ storyUrl }: Props) {
 
       {step === 'input' && (
         <form onSubmit={handleSubmit} className="max-w-sm mx-auto">
-          <div className="flex gap-2">
+          <div className="flex flex-col xs:flex-row gap-2">
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="メールアドレス"
               required
-              className="flex-1 px-4 py-2.5 rounded-full bg-epoch-card border border-epoch-border text-epoch-text placeholder-epoch-dim text-sm focus:outline-none focus:border-epoch-purple transition-colors"
+              className="w-full px-4 py-2.5 rounded-full bg-epoch-card border border-epoch-border text-epoch-text placeholder-epoch-dim text-sm focus:outline-none focus:border-epoch-purple transition-colors"
             />
             <button
               type="submit"
               disabled={loading}
-              className="px-5 py-2.5 bg-epoch-purple hover:bg-epoch-purple/80 disabled:opacity-50 text-white rounded-full text-sm font-medium transition-all whitespace-nowrap"
+              className="w-full xs:w-auto px-5 py-2.5 bg-epoch-purple hover:bg-epoch-purple/80 disabled:opacity-50 text-white rounded-full text-sm font-medium transition-all whitespace-nowrap"
             >
               {loading ? '確認中…' : '続きを読む'}
             </button>
