@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!-- 背景 -->
+  <rect width="32" height="32" rx="6" fill="#0B0B0F"/>
+  <!-- E の文字（Epoch ブランドカラー） -->
+  <text
+    x="16"
+    y="23"
+    font-family="Georgia, serif"
+    font-size="22"
+    font-weight="700"
+    fill="#A78BFA"
+    text-anchor="middle"
+  >E</text>
+</svg>
