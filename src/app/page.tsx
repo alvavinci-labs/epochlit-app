@@ -1,4 +1,4 @@
-import { getSupabasePublic } from '@/lib/supabase'
+import { getSupabaseAdmin } from '@/lib/supabase'
 import type { StoryCard } from '@/types'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
@@ -19,8 +19,8 @@ const GENRE_LABELS: Record<string, string> = {
 }
 
 async function getStories(): Promise<StoryCard[]> {
-  const { data, error } = await getSupabasePublic()
-    .from('stories_public')
+  const { data, error } = await getSupabaseAdmin()
+    .from('stories')
     .select('id, hash_id, title, genre, preview, image_url, alt_text, theme, published_at')
     .order('published_at', { ascending: false })
     .limit(100)

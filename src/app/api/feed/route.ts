@@ -1,9 +1,9 @@
 import { NextResponse } from 'next/server'
-import { getSupabasePublic } from '@/lib/supabase'
+import { getSupabaseAdmin } from '@/lib/supabase'
 
 export async function GET() {
-  const { data: stories } = await getSupabasePublic()
-    .from('stories_public')
+  const { data: stories } = await getSupabaseAdmin()
+    .from('stories')
     .select('hash_id, title, genre, preview, image_url, published_at')
     .order('published_at', { ascending: false })
     .limit(20)

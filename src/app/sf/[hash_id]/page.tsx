@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
 import Image from 'next/image'
-import { getSupabaseAdmin, getSupabasePublic } from '@/lib/supabase'
+import { getSupabaseAdmin } from '@/lib/supabase'
 import { getSession } from '@/lib/session'
 import type { Story } from '@/types'
 import Header from '@/components/Header'
@@ -17,8 +17,8 @@ interface Props {
 type PublicStory = Omit<Story, 'body' | 'quality_score' | 'created_at'>
 
 async function getPublicStory(hash_id: string): Promise<PublicStory | null> {
-  const { data, error } = await getSupabasePublic()
-    .from('stories_public')
+  const { data, error } = await getSupabaseAdmin()
+    .from('stories')
     .select('id, hash_id, title, genre, preview, image_url, alt_text, theme, hashtags, published_at')
     .eq('hash_id', hash_id)
     .single()

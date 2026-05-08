@@ -1,9 +1,9 @@
 import { MetadataRoute } from 'next'
-import { getSupabasePublic } from '@/lib/supabase'
+import { getSupabaseAdmin } from '@/lib/supabase'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const { data: stories } = await getSupabasePublic()
-    .from('stories_public')
+  const { data: stories } = await getSupabaseAdmin()
+    .from('stories')
     .select('hash_id, genre, published_at')
     .order('published_at', { ascending: false })
 
