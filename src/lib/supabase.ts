@@ -1,13 +1,34 @@
-import { createClient } from '@supabase/supabase-js'
+import { createClient, type SupabaseClient } from '@supabase/supabase-js'
 
-const supabaseUrl  = process.env.NEXT_PUBLIC_SUPABASE_URL!
-const supabaseAnon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
+type Database = any
 
-// クライアントサイド用（読み取り専用・RLS適用）
-export const supabase = createClient(supabaseUrl, supabaseAnon)
+let publicClient: SupabaseClient | null = null
+let adminClient: SupabaseClient | null = null
 
-// サーバーサイド用（全権限・Webhook/API ルートで使用）
-export const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey, {
-  auth: { autoRefreshToken: false, persistSession: false },
-})
+function getSupabaseUrl(): string {
+  const value = process.env.NEXT_PUBLIC_SUPABASE_URL
+  if (!value) throw new Error('NEXT_PUBLIC_SUPABASE_URL is not set')
+  return value
+}
+
+// 読み取り用（公開ビューのみを参照）
+export function getSupabasePublic(): SupabaseClient {
+  if (!publicClient) {
+    const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+    if (!anonKey) throw new Error('NEXT_PUBLIC_SUPABASE_ANON_KEY is not set')
+    publicClient = createClient<Database>(getSupabaseUrl(), anonKey)
+  }
+  return publicClient
+}
+
+// サーバーサイド用（Webhook/API ルート、有料本文取得で使用）
+export function getSupabaseAdmin(): SupabaseClient {
+  if (!adminClient) {
+    const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+    if (!serviceKey) throw new Error('SUPABASE_SERVICE_ROLE_KEY is not set')
+    adminClient = createClient<Database>(getSupabaseUrl(), serviceKey, {
+      auth: { autoRefreshToken: false, persistSession: false },
+    })
+  }
+  return adminClient
+}

@@ -1,12 +1,11 @@
 import { NextResponse } from 'next/server'
-import { supabase } from '@/lib/supabase'
+import { getSupabasePublic } from '@/lib/supabase'
 
 export async function GET() {
-  const { data: stories } = await supabase
-    .from('stories')
+  const { data: stories } = await getSupabasePublic()
+    .from('stories_public')
     .select('hash_id, title, genre, preview, image_url, published_at')
     .order('published_at', { ascending: false })
-    .order('created_at', { ascending: false })
     .limit(20)
 
   const items = (stories ?? []).map((s) => `

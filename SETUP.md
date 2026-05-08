@@ -2,8 +2,15 @@
 
 ## 1. パッケージインストール
 
+Node.js は `20.9.0` 以上が必要です。ローカルでは `.nvmrc` のバージョンを使ってください。
+
 ```bash
-cd /Users/asonhiroka/develop/alvavinc-labs/ai-team/epochlit-app
+cd /Users/sora/develop/epochlit-app
+nvm use
+```
+
+```bash
+cd /Users/sora/develop/epochlit-app
 npm install
 ```
 

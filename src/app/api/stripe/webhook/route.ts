@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { stripe } from '@/lib/stripe'
-import { supabaseAdmin } from '@/lib/supabase'
+import { getStripe } from '@/lib/stripe'
+import { getSupabaseAdmin } from '@/lib/supabase'
 
 export async function POST(req: NextRequest) {
   const body      = await req.text()
@@ -12,6 +12,7 @@ export async function POST(req: NextRequest) {
 
   let event
   try {
+    const stripe = getStripe()
     event = stripe.webhooks.constructEvent(
       body,
       signature,
@@ -27,11 +28,11 @@ export async function POST(req: NextRequest) {
     case 'customer.subscription.created':
     case 'customer.subscription.updated': {
       const sub      = event.data.object
-      const customer = await stripe.customers.retrieve(sub.customer as string)
+      const customer = await getStripe().customers.retrieve(sub.customer as string)
       const email    = 'email' in customer ? customer.email : null
       if (!email) break
 
-      await supabaseAdmin.from('subscribers').upsert({
+      await getSupabaseAdmin().from('subscribers').upsert({
         stripe_customer_id: sub.customer as string,
         email,
         status:     sub.status,
@@ -42,7 +43,7 @@ export async function POST(req: NextRequest) {
 
     case 'customer.subscription.deleted': {
       const sub = event.data.object
-      await supabaseAdmin
+      await getSupabaseAdmin()
         .from('subscribers')
         .update({ status: 'cancelled', updated_at: new Date().toISOString() })
         .eq('stripe_customer_id', sub.customer as string)

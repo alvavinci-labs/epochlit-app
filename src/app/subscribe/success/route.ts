@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { stripe } from '@/lib/stripe'
+import { getStripe } from '@/lib/stripe'
 import { setSession } from '@/lib/session'
+import { toSameOriginUrl } from '@/lib/urls'
 
 // Stripe Checkout 完了後のリダイレクト先
 // session_id からメールを取得し、JWTセッションCookieを発行して元ページへ戻す
@@ -8,7 +9,7 @@ export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url)
   const session_id = searchParams.get('session_id')
   const return_to  = searchParams.get('return_to')
-  const returnTo   = return_to ? decodeURIComponent(return_to) : '/'
+  const returnTo   = toSameOriginUrl(return_to, req.nextUrl.origin)
 
   if (!session_id) {
     return NextResponse.redirect(new URL(returnTo, req.url))
@@ -16,7 +17,7 @@ export async function GET(req: NextRequest) {
 
   try {
     // Stripe セッションからメールアドレスを取得
-    const session = await stripe.checkout.sessions.retrieve(session_id)
+    const session = await getStripe().checkout.sessions.retrieve(session_id)
     const email = session.customer_email ?? session.customer_details?.email ?? null
 
     if (email) {

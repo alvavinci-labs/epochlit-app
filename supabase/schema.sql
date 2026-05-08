@@ -39,16 +39,16 @@ CREATE INDEX IF NOT EXISTS subscribers_email_idx     ON subscribers (email);
 ALTER TABLE stories     ENABLE ROW LEVEL SECURITY;
 ALTER TABLE subscribers ENABLE ROW LEVEL SECURITY;
 
--- stories: 誰でも読める（preview・image_url・title 等）
--- body（全文）はサーバーサイドでアクセス制御するため、
--- anon キーでは body を除いたカラムのみ SELECT できるビューを作る
+-- stories: 本文 body を含む実テーブルは service role のみが読む
+-- anon / authenticated は body を除いた公開ビューだけを読む
+DROP POLICY IF EXISTS "anon can read stories_public" ON stories;
+REVOKE ALL ON TABLE stories FROM anon, authenticated;
+
 CREATE OR REPLACE VIEW stories_public AS
   SELECT id, hash_id, title, genre, preview, image_url, alt_text, theme, hashtags, published_at
   FROM stories;
 
--- anon: stories_public ビューを読める
-CREATE POLICY "anon can read stories_public" ON stories
-  FOR SELECT USING (true);
+GRANT SELECT ON stories_public TO anon, authenticated;
 
 -- subscribers: 外部からは読み書き不可（service role のみ）
 CREATE POLICY "service role only" ON subscribers

@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { getSession } from '@/lib/session'
-import { stripe } from '@/lib/stripe'
+import { getStripe } from '@/lib/stripe'
 
 export async function GET() {
   // セッション確認
@@ -12,6 +12,7 @@ export async function GET() {
   const email = session.email
 
   try {
+    const stripe = getStripe()
     // Stripe からサブスクリプション情報を取得
     const customers = await stripe.customers.list({ email, limit: 5 })
 

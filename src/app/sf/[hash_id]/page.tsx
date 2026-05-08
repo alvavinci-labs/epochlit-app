@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
 import Image from 'next/image'
-import { supabase } from '@/lib/supabase'
+import { getSupabaseAdmin, getSupabasePublic } from '@/lib/supabase'
 import { getSession } from '@/lib/session'
 import type { Story } from '@/types'
 import Header from '@/components/Header'
@@ -14,21 +14,34 @@ interface Props {
   params: Promise<{ hash_id: string }>
 }
 
-async function getStory(hash_id: string): Promise<Story | null> {
-  const { data, error } = await supabase
-    .from('stories')
-    .select('*')
+type PublicStory = Omit<Story, 'body' | 'quality_score' | 'created_at'>
+
+async function getPublicStory(hash_id: string): Promise<PublicStory | null> {
+  const { data, error } = await getSupabasePublic()
+    .from('stories_public')
+    .select('id, hash_id, title, genre, preview, image_url, alt_text, theme, hashtags, published_at')
     .eq('hash_id', hash_id)
     .single()
 
   if (error || !data) return null
-  return data as Story
+  return data as PublicStory
+}
+
+async function getPaidStoryBody(hash_id: string): Promise<string | null> {
+  const { data, error } = await getSupabaseAdmin()
+    .from('stories')
+    .select('body')
+    .eq('hash_id', hash_id)
+    .single()
+
+  if (error || !data) return null
+  return data.body as string
 }
 
 // 動的OGPメタデータ生成
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { hash_id } = await params
-  const story = await getStory(hash_id)
+  const story = await getPublicStory(hash_id)
   if (!story) return { title: '作品が見つかりません' }
 
   const description = story.preview.slice(0, 80)
@@ -64,11 +77,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function StoryPage({ params }: Props) {
   const { hash_id } = await params
-  const story   = await getStory(hash_id)
+  const story   = await getPublicStory(hash_id)
   if (!story) notFound()
 
   const session = await getSession()
   const isPaid  = session?.verified === true
+  const body = isPaid ? await getPaidStoryBody(hash_id) : null
 
   const publishedDate = new Date(story.published_at).toLocaleDateString('ja-JP', {
     year: 'numeric', month: 'long', day: 'numeric',
@@ -137,11 +151,11 @@ export default async function StoryPage({ params }: Props) {
           </div>
 
           {/* ペイウォール or 全文 */}
-          {isPaid ? (
+          {isPaid && body ? (
             <>
               {/* 全文（有料会員） */}
               <div className="prose-epoch text-epoch-text text-base leading-[2.0] tracking-wide mt-2">
-                {story.body.split('\n').map((para, i) => (
+                {body.split('\n').map((para, i) => (
                   para.trim() ? (
                     <p key={i} className="mb-5">{para}</p>
                   ) : (

@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { getSession } from '@/lib/session'
-import { stripe } from '@/lib/stripe'
-import { supabaseAdmin } from '@/lib/supabase'
+import { getStripe } from '@/lib/stripe'
+import { getSupabaseAdmin } from '@/lib/supabase'
 
 export async function POST() {
   // セッション確認
@@ -13,6 +13,7 @@ export async function POST() {
   const email = session.email
 
   try {
+    const stripe = getStripe()
     // Stripe からアクティブなサブスクリプションを取得
     const customers = await stripe.customers.list({ email, limit: 5 })
 
@@ -32,7 +33,7 @@ export async function POST() {
         })
 
         // Supabase の subscribers テーブルを更新
-        await supabaseAdmin
+        await getSupabaseAdmin()
           .from('subscribers')
           .update({
             status:     'cancel_at_period_end',

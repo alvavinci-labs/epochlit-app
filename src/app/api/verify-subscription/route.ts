@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { checkSubscription, createCheckoutSession } from '@/lib/stripe'
 import { setSession } from '@/lib/session'
+import { toSameOriginUrl } from '@/lib/urls'
 
 export async function POST(req: NextRequest) {
   try {
@@ -20,7 +21,8 @@ export async function POST(req: NextRequest) {
 
     if (createCheckout && returnUrl) {
       // Stripe Checkout セッションを生成
-      const checkoutUrl = await createCheckoutSession(email, returnUrl)
+      const safeReturnUrl = toSameOriginUrl(returnUrl, req.nextUrl.origin)
+      const checkoutUrl = await createCheckoutSession(email, safeReturnUrl)
       return NextResponse.json({ verified: false, checkoutUrl })
     }
 

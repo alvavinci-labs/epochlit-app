@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { supabaseAdmin } from '@/lib/supabase'
+import { getSupabaseAdmin } from '@/lib/supabase'
 import { generateHashId } from '@/lib/hashid'
 import type { CreateStoryRequest } from '@/types'
 
@@ -30,7 +30,7 @@ export async function POST(req: NextRequest) {
 
   const hash_id = generateHashId()
 
-  const { data, error } = await supabaseAdmin
+  const { data, error } = await getSupabaseAdmin()
     .from('stories')
     .insert({
       hash_id,
