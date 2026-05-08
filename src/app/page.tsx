@@ -23,6 +23,7 @@ async function getStories(): Promise<StoryCard[]> {
     .from('stories')
     .select('id, hash_id, title, genre, preview, image_url, alt_text, theme, published_at')
     .order('published_at', { ascending: false })
+    .order('created_at', { ascending: false })
     .limit(100)
 
   if (error) {

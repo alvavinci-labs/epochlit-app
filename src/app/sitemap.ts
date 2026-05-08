@@ -6,6 +6,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     .from('stories')
     .select('hash_id, genre, published_at')
     .order('published_at', { ascending: false })
+    .order('created_at', { ascending: false })
 
   const storyUrls = (stories ?? []).map((s) => ({
     url:          `https://epochlit.com/${s.genre}/${s.hash_id}`,
