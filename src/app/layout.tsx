@@ -1,6 +1,8 @@
 import type { Metadata } from 'next'
 import { Noto_Sans_JP, Noto_Serif_JP } from 'next/font/google'
 import Script from 'next/script'
+import { Suspense } from 'react'
+import SubscriptionSuccessTracker from '@/components/SubscriptionSuccessTracker'
 import './globals.css'
 
 const notoSans = Noto_Sans_JP({
@@ -73,6 +75,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             gtag('config', 'G-RKZNCCLM9C');
           `}
         </Script>
+        {/* Stripe サブスク登録完了時の GA purchase イベント発火（useSearchParams は Suspense 必須） */}
+        <Suspense fallback={null}>
+          <SubscriptionSuccessTracker />
+        </Suspense>
         {children}
       </body>
     </html>

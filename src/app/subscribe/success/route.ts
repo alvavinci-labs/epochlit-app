@@ -22,7 +22,10 @@ export async function GET(req: NextRequest) {
 
     if (email) {
       // Route Handler 内では Cookie の書き込みが可能
-      const response = NextResponse.redirect(new URL(returnTo, req.url))
+      // GA purchase イベント発火のため ?epoch_subscribed=1 を付与してリダイレクト
+      const redirectUrl = new URL(returnTo, req.url)
+      redirectUrl.searchParams.set('epoch_subscribed', '1')
+      const response = NextResponse.redirect(redirectUrl)
       await setSessionToResponse(email, response)
       return response
     }
