@@ -7,6 +7,7 @@ import type { StoryCard } from '@/types'
 interface Props {
   title: string
   stories: StoryCard[]
+  moreHref?: string
 }
 
 function formatDate(iso: string): string {
@@ -51,15 +52,25 @@ function Card({ story }: { story: StoryCard }) {
   )
 }
 
-export default function GenreRow({ title, stories }: Props) {
+export default function GenreRow({ title, stories, moreHref }: Props) {
   if (stories.length === 0) return null
 
   return (
     <section className="mb-10">
       {/* 行ヘッダー */}
-      <h2 className="font-serif text-epoch-muted text-xs tracking-[0.3em] uppercase px-6 sm:px-10 mb-4">
-        {title}
-      </h2>
+      <div className="flex items-center justify-between px-6 sm:px-10 mb-4">
+        <h2 className="font-serif text-epoch-muted text-xs tracking-[0.3em] uppercase">
+          {title}
+        </h2>
+        {moreHref && (
+          <Link href={moreHref} className="text-epoch-dim hover:text-epoch-muted text-xs transition-colors flex items-center gap-1">
+            すべて見る
+            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
+          </Link>
+        )}
+      </div>
 
       {/* 横スクロールコンテナ */}
       <div className="flex gap-3 overflow-x-auto px-6 sm:px-10 pb-4 scrollbar-hide scroll-smooth snap-x snap-mandatory">

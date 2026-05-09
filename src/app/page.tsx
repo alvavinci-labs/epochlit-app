@@ -45,8 +45,8 @@ export default async function HomePage() {
     genreMap.get(key)!.push(story)
   }
 
-  // 「最新作」行：全ジャンル混合で最新 20 件
-  const latestRow = stories.slice(0, 20)
+  // 「最新作」行：全ジャンル混合で最新 8 件
+  const latestRow = stories.slice(0, 8)
 
   return (
     <>
@@ -71,13 +71,14 @@ export default async function HomePage() {
               {/* 最新作（全ジャンル混合・最新20件） */}
               <GenreRow title="最新作" stories={latestRow} />
 
-              {/* ジャンル別：複数ジャンルが存在し、かつそのジャンルに2件以上ある場合のみ表示 */}
-              {genreMap.size >= 2 && Array.from(genreMap.entries()).map(([genre, genreStories]) => (
-                genreStories.length >= 2 && (
+              {/* ジャンル別：1ジャンル以上あれば表示。各ジャンルは1件以上で表示 */}
+              {genreMap.size >= 1 && Array.from(genreMap.entries()).map(([genre, genreStories]) => (
+                genreStories.length >= 1 && (
                   <GenreRow
                     key={genre}
                     title={GENRE_LABELS[genre] ?? genre.toUpperCase()}
-                    stories={genreStories}
+                    stories={genreStories.slice(0, 20)}
+                    moreHref={`/${genre}`}
                   />
                 )
               ))}
