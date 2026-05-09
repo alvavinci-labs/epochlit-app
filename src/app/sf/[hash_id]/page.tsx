@@ -3,10 +3,11 @@ import type { Metadata } from 'next'
 import Image from 'next/image'
 import { getSupabaseAdmin } from '@/lib/supabase'
 import { getSession } from '@/lib/session'
-import type { Story } from '@/types'
+import type { Story, StoryCard as StoryCardType } from '@/types'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import Paywall from '@/components/Paywall'
+import StoryCard from '@/components/StoryCard'
 
 export const revalidate = 3600
 
@@ -25,6 +26,19 @@ async function getPublicStory(hash_id: string): Promise<PublicStory | null> {
 
   if (error || !data) return null
   return data as PublicStory
+}
+
+async function getRelatedStories(genre: string, excludeHashId: string): Promise<StoryCardType[]> {
+  const { data, error } = await getSupabaseAdmin()
+    .from('stories')
+    .select('id, hash_id, title, genre, preview, image_url, alt_text, theme, published_at')
+    .eq('genre', genre)
+    .neq('hash_id', excludeHashId)
+    .order('published_at', { ascending: false })
+    .limit(3)
+
+  if (error || !data) return []
+  return data as StoryCardType[]
 }
 
 async function getPaidStoryBody(hash_id: string): Promise<string | null> {
@@ -82,7 +96,10 @@ export default async function StoryPage({ params }: Props) {
 
   const session = await getSession()
   const isPaid  = session?.verified === true
-  const body = isPaid ? await getPaidStoryBody(hash_id) : null
+  const [body, relatedStories] = await Promise.all([
+    isPaid ? getPaidStoryBody(hash_id) : Promise.resolve(null),
+    getRelatedStories(story.genre, hash_id),
+  ])
 
   const publishedDate = new Date(story.published_at).toLocaleDateString('ja-JP', {
     year: 'numeric', month: 'long', day: 'numeric',
@@ -213,6 +230,31 @@ export default async function StoryPage({ params }: Props) {
               X でシェア
             </a>
           </div>
+
+          {/* 他の作品も読む */}
+          {relatedStories.length > 0 && (
+            <div className="mt-16 pt-12 border-t border-epoch-border/40">
+              <h2 className="font-serif text-lg font-semibold text-epoch-text mb-6">
+                他の作品も読む
+              </h2>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                {relatedStories.map((related) => (
+                  <StoryCard key={related.hash_id} story={related} />
+                ))}
+              </div>
+              <div className="mt-8 text-center">
+                <a
+                  href={`/${story.genre}/`}
+                  className="inline-flex items-center gap-1.5 text-sm text-epoch-muted hover:text-epoch-text transition-colors"
+                >
+                  すべての作品を見る
+                  <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+                  </svg>
+                </a>
+              </div>
+            </div>
+          )}
         </article>
       </main>
 

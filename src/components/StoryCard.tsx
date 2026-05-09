@@ -16,7 +16,7 @@ function formatDate(iso: string): string {
 
 export default function StoryCard({ story }: Props) {
   return (
-    <Link href={`/sf/${story.hash_id}`} className="block group">
+    <Link href={`/${story.genre}/${story.hash_id}`} className="block group">
       <article className="story-card bg-epoch-card rounded-xl overflow-hidden border border-epoch-border/40">
         {/* サムネイル画像 */}
         <div className="relative aspect-square overflow-hidden">
@@ -30,7 +30,7 @@ export default function StoryCard({ story }: Props) {
           <div className="absolute inset-0 bg-card-gradient" />
           {/* ジャンルバッジ */}
           <span className="absolute top-3 left-3 px-2 py-0.5 text-xs bg-epoch-purple/80 text-white rounded-full font-medium backdrop-blur-sm">
-            SF
+            {story.genre.toUpperCase()}
           </span>
         </div>
 
