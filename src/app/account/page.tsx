@@ -7,6 +7,7 @@ import EmailLookup from './EmailLookup'
 
 export const metadata: Metadata = {
   title: 'アカウント管理',
+  robots: { index: false, follow: false },
 }
 
 export default async function AccountPage() {

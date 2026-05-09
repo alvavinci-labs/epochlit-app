@@ -5,6 +5,7 @@ import Footer from '@/components/Footer'
 
 export const metadata: Metadata = {
   title: 'お支払いをキャンセルしました',
+  robots: { index: false, follow: false },
 }
 
 export default function SubscribeCancelPage() {

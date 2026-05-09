@@ -71,7 +71,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       description,
       images:      [story.image_url],
     },
-    alternates: { canonical: url },
+    alternates: { canonical: `https://epochlit.com/sf/${hash_id}` },
   }
 }
 
@@ -89,16 +89,36 @@ export default async function StoryPage({ params }: Props) {
   })
 
   // JSON-LD 構造化データ
+  const storyUrl = `https://epochlit.com/sf/${hash_id}`
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type':    'Article',
+    mainEntityOfPage: {
+      '@type': 'WebPage',
+      '@id':   storyUrl,
+    },
     headline:   story.title,
     description: story.preview.slice(0, 80),
     image:      story.image_url,
     datePublished: story.published_at,
-    author:     { '@type': 'Organization', name: 'Epoch' },
-    publisher:  { '@type': 'Organization', name: 'Epoch' },
-    url:        `https://epochlit.com/sf/${hash_id}`,
+    dateModified:  story.published_at,
+    author: {
+      '@type': 'Organization',
+      name:    'Epoch',
+      url:     'https://epochlit.com',
+    },
+    publisher: {
+      '@type': 'Organization',
+      name:    'Epoch',
+      url:     'https://epochlit.com',
+      logo: {
+        '@type': 'ImageObject',
+        url:     'https://epochlit.com/opengraph-image',
+        width:   1200,
+        height:  630,
+      },
+    },
+    url: storyUrl,
   }
 
   return (

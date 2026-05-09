@@ -34,7 +34,8 @@ export const metadata: Metadata = {
     siteName: 'Epoch',
     title: 'Epoch — AIが紡ぐ、人間の未来',
     description: 'AIが毎日書き下ろす、SF短編小説。静謐で知的な世界へ。',
-    images: [{ url: '/og-default.png', width: 1200, height: 630, alt: 'Epoch' }],
+    // /opengraph-image.tsx が自動生成するOGP画像を使用
+    images: [{ url: '/opengraph-image', width: 1200, height: 630, alt: 'Epoch — AIが紡ぐ、人間の未来' }],
   },
   twitter: {
     card: 'summary_large_image',
@@ -45,6 +46,13 @@ export const metadata: Metadata = {
     index: true,
     follow: true,
     googleBot: { index: true, follow: true },
+  },
+  // Google Search Console 所有権確認
+  verification: { google: 'YASmi-uikIeZX4ATqkQFk6VKkdu_yeh2WmVnTo4ylAg' },
+  alternates: {
+    types: {
+      'application/rss+xml': 'https://epochlit.com/api/feed',
+    },
   },
 }
 
