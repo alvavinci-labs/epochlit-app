@@ -8,11 +8,12 @@ import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import Paywall from '@/components/Paywall'
 import StoryCard from '@/components/StoryCard'
+import { storyHref } from '@/lib/routes'
 
 export const revalidate = 3600
 
 interface Props {
-  params: Promise<{ hash_id: string }>
+  params: Promise<{ genre?: string; hash_id: string }>
 }
 
 type PublicStory = Omit<Story, 'body' | 'quality_score' | 'created_at'>
@@ -54,12 +55,12 @@ async function getPaidStoryBody(hash_id: string): Promise<string | null> {
 
 // 動的OGPメタデータ生成
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { hash_id } = await params
+  const { genre, hash_id } = await params
   const story = await getPublicStory(hash_id)
-  if (!story) return { title: '作品が見つかりません' }
+  if (!story || (genre && story.genre !== genre)) return { title: '作品が見つかりません' }
 
   const description = story.preview.slice(0, 80)
-  const url = `https://epochlit.com/sf/${hash_id}`
+  const url = `https://epochlit.com${storyHref(story.genre, hash_id)}`
 
   return {
     title: story.title,
@@ -85,14 +86,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       description,
       images:      [story.image_url],
     },
-    alternates: { canonical: `https://epochlit.com/sf/${hash_id}` },
+    alternates: { canonical: url },
   }
 }
 
 export default async function StoryPage({ params }: Props) {
-  const { hash_id } = await params
+  const { genre, hash_id } = await params
   const story   = await getPublicStory(hash_id)
-  if (!story) notFound()
+  if (!story || (genre && story.genre !== genre)) notFound()
 
   const session = await getSession()
   const isPaid  = session?.verified === true
@@ -106,7 +107,7 @@ export default async function StoryPage({ params }: Props) {
   })
 
   // JSON-LD 構造化データ
-  const storyUrl = `https://epochlit.com/sf/${hash_id}`
+  const storyUrl = `https://epochlit.com${storyHref(story.genre, hash_id)}`
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type':    'Article',
@@ -202,7 +203,7 @@ export default async function StoryPage({ params }: Props) {
               </div>
             </>
           ) : (
-            <Paywall storyUrl={`https://epochlit.com/sf/${hash_id}`} />
+            <Paywall storyUrl={storyUrl} />
           )}
 
           {/* ハッシュタグ */}
@@ -219,7 +220,7 @@ export default async function StoryPage({ params }: Props) {
           {/* X でシェア */}
           <div className="mt-10 pt-8 border-t border-epoch-border/40 text-center">
             <a
-              href={`https://x.com/intent/tweet?text=${encodeURIComponent(`${story.title} — Epoch SF短編小説\nhttps://epochlit.com/sf/${hash_id}\n${story.hashtags?.join(' ')}\n#Epoch`)}`}
+              href={`https://x.com/intent/tweet?text=${encodeURIComponent(`${story.title} — Epoch短編小説\n${storyUrl}\n${story.hashtags?.join(' ')}\n#Epoch`)}`}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 px-5 py-2.5 border border-epoch-border text-epoch-muted hover:text-epoch-text hover:border-epoch-muted rounded-full text-sm transition-all"

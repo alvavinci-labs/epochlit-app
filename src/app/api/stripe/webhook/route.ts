@@ -13,10 +13,13 @@ export async function POST(req: NextRequest) {
   let event
   try {
     const stripe = getStripe()
+    const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET
+    if (!webhookSecret) throw new Error('STRIPE_WEBHOOK_SECRET is not set')
+
     event = stripe.webhooks.constructEvent(
       body,
       signature,
-      process.env.STRIPE_WEBHOOK_SECRET!
+      webhookSecret
     )
   } catch (err) {
     console.error('Webhook 署名検証エラー:', err)

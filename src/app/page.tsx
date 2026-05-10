@@ -4,19 +4,10 @@ import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import HeroSection from '@/components/HeroSection'
 import GenreRow from '@/components/GenreRow'
+import { genreLabel } from '@/lib/genres'
 
 // 1時間キャッシュ
 export const revalidate = 3600
-
-// ジャンルの表示名マップ
-const GENRE_LABELS: Record<string, string> = {
-  sf:      'SF',
-  fantasy: 'ファンタジー',
-  mystery: 'ミステリー',
-  horror:  'ホラー',
-  romance: 'ロマンス',
-  other:   'その他',
-}
 
 async function getStories(): Promise<StoryCard[]> {
   const { data, error } = await getSupabaseAdmin()
@@ -76,7 +67,7 @@ export default async function HomePage() {
                 genreStories.length >= 1 && (
                   <GenreRow
                     key={genre}
-                    title={GENRE_LABELS[genre] ?? genre.toUpperCase()}
+                    title={genreLabel(genre)}
                     stories={genreStories.slice(0, 20)}
                     moreHref={`/${genre}`}
                   />

@@ -1,17 +1,27 @@
 import { SignJWT, jwtVerify } from 'jose'
 import { cookies } from 'next/headers'
+import type { NextResponse } from 'next/server'
 import type { SessionPayload } from '@/types'
 
-const SECRET = new TextEncoder().encode(process.env.SESSION_SECRET!)
 const COOKIE_NAME = 'epoch_session'
 const SESSION_DURATION = 60 * 60 * 24 * 7 // 7日間
 
-// セッションCookieを発行する
-export async function setSession(email: string): Promise<void> {
-  const token = await new SignJWT({ email, verified: true })
+function getSessionSecret(): Uint8Array {
+  const secret = process.env.SESSION_SECRET
+  if (!secret) throw new Error('SESSION_SECRET is not set')
+  return new TextEncoder().encode(secret)
+}
+
+async function createSessionToken(email: string): Promise<string> {
+  return new SignJWT({ email, verified: true })
     .setProtectedHeader({ alg: 'HS256' })
     .setExpirationTime(`${SESSION_DURATION}s`)
-    .sign(SECRET)
+    .sign(getSessionSecret())
+}
+
+// セッションCookieを発行する
+export async function setSession(email: string): Promise<void> {
+  const token = await createSessionToken(email)
 
   const cookieStore = await cookies()
   cookieStore.set(COOKIE_NAME, token, {
@@ -25,16 +35,30 @@ export async function setSession(email: string): Promise<void> {
 
 // セッションを検証して有効なら SessionPayload を返す
 export async function getSession(): Promise<SessionPayload | null> {
-  try {
-    const cookieStore = await cookies()
-    const token = cookieStore.get(COOKIE_NAME)?.value
-    if (!token) return null
+  const cookieStore = await cookies()
+  const token = cookieStore.get(COOKIE_NAME)?.value
+  if (!token) return null
 
-    const { payload } = await jwtVerify(token, SECRET)
+  const secret = getSessionSecret()
+
+  try {
+    const { payload } = await jwtVerify(token, secret)
     return payload as unknown as SessionPayload
   } catch {
     return null
   }
+}
+
+// Route Handler の redirect response にセッションCookieを付与する
+export async function setSessionToResponse(email: string, response: NextResponse): Promise<void> {
+  const token = await createSessionToken(email)
+  response.cookies.set(COOKIE_NAME, token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax',
+    maxAge: SESSION_DURATION,
+    path: '/',
+  })
 }
 
 // セッションを削除する

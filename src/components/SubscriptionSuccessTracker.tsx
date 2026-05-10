@@ -2,9 +2,7 @@
 
 import { useEffect } from 'react'
 import { useSearchParams, useRouter, usePathname } from 'next/navigation'
-
-// gtag の型定義（layout.tsx の Script タグで読み込まれるグローバル関数）
-declare function gtag(command: string, action: string, params?: Record<string, string>): void
+import { trackEvent } from '@/lib/analytics'
 
 /**
  * Stripe Checkout 完了後に GA の purchase イベントを発火するコンポーネント。
@@ -20,7 +18,7 @@ export default function SubscriptionSuccessTracker() {
     if (searchParams.get('epoch_subscribed') !== '1') return
 
     // GA purchase イベントを送信
-    gtag('event', 'purchase', {
+    trackEvent('purchase', {
       event_category: 'conversion',
       event_label:    'epoch_subscription',
     })

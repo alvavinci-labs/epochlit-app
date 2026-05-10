@@ -1,9 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-
-// gtag の型定義（layout.tsx の Script タグで読み込まれるグローバル関数）
-declare function gtag(command: string, action: string, params?: Record<string, string>): void
+import { trackEvent } from '@/lib/analytics'
 
 interface Props {
   storyUrl: string // 現在のページURL（Stripe成功後のリダイレクト先）
@@ -17,7 +15,7 @@ export default function Paywall({ storyUrl }: Props) {
 
   // ペイウォール表示時に計測
   useEffect(() => {
-    gtag('event', 'paywall_shown', { event_category: 'engagement' })
+    trackEvent('paywall_shown', { event_category: 'engagement' })
   }, [])
 
   async function handleSubmit(e: React.FormEvent) {
@@ -27,7 +25,7 @@ export default function Paywall({ storyUrl }: Props) {
     setError('')
 
     // メールアドレス送信を計測
-    gtag('event', 'paywall_email_submit', { event_category: 'engagement' })
+    trackEvent('paywall_email_submit', { event_category: 'engagement' })
 
     try {
       const res = await fetch('/api/verify-subscription', {
@@ -42,7 +40,7 @@ export default function Paywall({ storyUrl }: Props) {
         window.location.reload()
       } else if (data.checkoutUrl) {
         // 未会員 → Stripe Checkout へ遷移
-        gtag('event', 'begin_checkout', { event_category: 'conversion' })
+        trackEvent('begin_checkout', { event_category: 'conversion' })
         window.location.href = data.checkoutUrl
       } else {
         setStep('notfound')
@@ -112,7 +110,7 @@ export default function Paywall({ storyUrl }: Props) {
                 const data = await res.json()
                 if (data.checkoutUrl) {
                   // 新規会員登録 → Stripe Checkout へ遷移
-                  gtag('event', 'begin_checkout', { event_category: 'conversion', event_label: 'new_member' })
+                  trackEvent('begin_checkout', { event_category: 'conversion', event_label: 'new_member' })
                   window.location.href = data.checkoutUrl
                 }
                 setLoading(false)

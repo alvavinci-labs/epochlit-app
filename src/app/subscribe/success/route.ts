@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getStripe } from '@/lib/stripe'
-import { setSession } from '@/lib/session'
+import { setSessionToResponse } from '@/lib/session'
 import { toSameOriginUrl } from '@/lib/urls'
 
 // Stripe Checkout 完了後のリダイレクト先
@@ -34,24 +34,4 @@ export async function GET(req: NextRequest) {
   }
 
   return NextResponse.redirect(new URL(returnTo, req.url))
-}
-
-// Route Handler 用: レスポンスオブジェクトに直接 Cookie をセット
-async function setSessionToResponse(email: string, response: NextResponse) {
-  const { SignJWT } = await import('jose')
-  const SECRET = new TextEncoder().encode(process.env.SESSION_SECRET!)
-  const SESSION_DURATION = 60 * 60 * 24 * 7 // 7日間
-
-  const token = await new SignJWT({ email, verified: true })
-    .setProtectedHeader({ alg: 'HS256' })
-    .setExpirationTime(`${SESSION_DURATION}s`)
-    .sign(SECRET)
-
-  response.cookies.set('epoch_session', token, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'lax',
-    maxAge: SESSION_DURATION,
-    path: '/',
-  })
 }

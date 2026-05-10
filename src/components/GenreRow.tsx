@@ -3,6 +3,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import type { StoryCard } from '@/types'
+import { storyHref } from '@/lib/routes'
 
 interface Props {
   title: string
@@ -19,7 +20,7 @@ function formatDate(iso: string): string {
 
 function Card({ story }: { story: StoryCard }) {
   return (
-    <Link href={`/sf/${story.hash_id}`} className="block group flex-none w-44 sm:w-52">
+    <Link href={storyHref(story.genre, story.hash_id)} className="block group flex-none w-44 sm:w-52">
       <article>
         {/* サムネイル */}
         <div className="relative w-full aspect-[2/3] rounded-lg overflow-hidden mb-2">

@@ -38,6 +38,9 @@ export async function checkSubscription(email: string): Promise<boolean> {
 // Stripe Checkout セッションを作成する
 export async function createCheckoutSession(email: string, returnUrl: string): Promise<string> {
   const stripe = getStripe()
+  const priceId = process.env.STRIPE_PRICE_ID
+  if (!priceId) throw new Error('STRIPE_PRICE_ID is not set')
+
   // returnUrl からオリジンを取得（success_url のベースに使用）
   const origin = new URL(returnUrl).origin
   const session = await stripe.checkout.sessions.create({
@@ -45,7 +48,7 @@ export async function createCheckoutSession(email: string, returnUrl: string): P
     customer_email: email,
     line_items: [
       {
-        price: process.env.STRIPE_PRICE_ID!,
+        price: priceId,
         quantity: 1,
       },
     ],

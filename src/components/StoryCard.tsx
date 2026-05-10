@@ -1,6 +1,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import type { StoryCard } from '@/types'
+import { storyHref } from '@/lib/routes'
 
 interface Props {
   story: StoryCard
@@ -16,7 +17,7 @@ function formatDate(iso: string): string {
 
 export default function StoryCard({ story }: Props) {
   return (
-    <Link href={`/${story.genre}/${story.hash_id}`} className="block group">
+    <Link href={storyHref(story.genre, story.hash_id)} className="block group">
       <article className="story-card bg-epoch-card rounded-xl overflow-hidden border border-epoch-border/40">
         {/* サムネイル画像 */}
         <div className="relative aspect-square overflow-hidden">
