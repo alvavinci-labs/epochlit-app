@@ -1,6 +1,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import type { StoryCard } from '@/types'
+import { storyHref } from '@/lib/routes'
 
 interface Props {
   story: StoryCard
@@ -34,7 +35,7 @@ export default function HeroSection({ story }: Props) {
             {story.preview.slice(0, 120)}…
           </p>
           <Link
-            href={`/sf/${story.hash_id}`}
+            href={storyHref(story.genre, story.hash_id)}
             className="inline-flex items-center gap-2 px-6 py-3 bg-epoch-purple hover:bg-epoch-purple/80 text-white rounded-full font-medium transition-all text-sm"
           >
             今すぐ読む

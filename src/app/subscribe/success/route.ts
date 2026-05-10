@@ -25,6 +25,13 @@ export async function GET(req: NextRequest) {
       // GA purchase イベント発火のため ?epoch_subscribed=1 を付与してリダイレクト
       const redirectUrl = new URL(returnTo, req.url)
       redirectUrl.searchParams.set('epoch_subscribed', '1')
+      redirectUrl.searchParams.set('epoch_transaction_id', session.id)
+      if (session.amount_total !== null) {
+        redirectUrl.searchParams.set('epoch_value', String(session.amount_total / 100))
+      }
+      if (session.currency) {
+        redirectUrl.searchParams.set('epoch_currency', session.currency.toUpperCase())
+      }
       const response = NextResponse.redirect(redirectUrl)
       await setSessionToResponse(email, response)
       return response

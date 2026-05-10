@@ -1,4 +1,4 @@
-type GtagParams = Record<string, string>
+type GtagParams = Record<string, string | number>
 type Gtag = (command: string, action: string, params?: GtagParams) => void
 
 declare global {

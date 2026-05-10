@@ -120,6 +120,12 @@ export default async function StoryPage({ params }: Props) {
     image:      story.image_url,
     datePublished: story.published_at,
     dateModified:  story.published_at,
+    isAccessibleForFree: false,
+    hasPart: {
+      '@type': 'WebPageElement',
+      isAccessibleForFree: false,
+      cssSelector: '.paywall',
+    },
     author: {
       '@type': 'Organization',
       name:    'Epoch',
@@ -192,7 +198,7 @@ export default async function StoryPage({ params }: Props) {
           {isPaid && body ? (
             <>
               {/* 全文（有料会員） */}
-              <div className="prose-epoch text-epoch-text text-base leading-[2.0] tracking-wide mt-2">
+              <div className="paywall prose-epoch text-epoch-text text-base leading-[2.0] tracking-wide mt-2">
                 {body.split('\n').map((para, i) => (
                   para.trim() ? (
                     <p key={i} className="mb-5">{para}</p>
